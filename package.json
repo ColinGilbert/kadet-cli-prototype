@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "D": "^1.0.0",
+    "inquirer": "^9.2.8",
     "pact-lang-api": "^4.3.6"
   }
 }
