@@ -10,7 +10,7 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "All rights reserved",
   "devDependencies": {
     "dotenv": "^16.3.1",
     "ts-node": "^10.9.1",

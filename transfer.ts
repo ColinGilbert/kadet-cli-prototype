@@ -44,7 +44,7 @@ export async function transfer(
   };
 
   const response = await Pact.fetch.send(cmd, API_HOST);
-  console.log(response);
+  // console.log(response);
   console.log(`Request key: ${response.requestKeys[0]}`);
   console.log("Transaction pending...");
 
