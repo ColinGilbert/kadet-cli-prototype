@@ -1,6 +1,6 @@
-import * as Pact from "pact-lang-api";
+import Pact from "pact-lang-api";
 
-import { NETWORK_ID, CHAIN_ID, API_HOST, creationTime } from "./constants";
+import { NETWORK_ID, CHAIN_ID, API_HOST, creationTime } from "./constants.js";
 import "dotenv/config";
 const KEY_PAIR = {
   publicKey: process.env.SENDER_PUBKEY,
@@ -23,5 +23,5 @@ export async function getBalance(account: string) {
   };
 
   const result = await Pact.fetch.local(cmd, API_HOST);
-  console.log(result);
+  return result;
 }

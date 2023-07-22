@@ -1,6 +1,6 @@
 // const Pact = require("pact-lang-api");
-import * as Pact from "pact-lang-api";
-import { NETWORK_ID, CHAIN_ID, API_HOST, creationTime } from "./constants";
+import Pact from "pact-lang-api";
+import { NETWORK_ID, CHAIN_ID, API_HOST, creationTime } from "./constants.js";
 import "dotenv/config";
 const KEY_PAIR = {
   publicKey: process.env.SENDER_PUBKEY,
@@ -45,7 +45,7 @@ export async function transfer(
 
   const response = await Pact.fetch.send(cmd, API_HOST);
   // console.log(response);
-  console.log(`Request key: ${response.requestKeys[0]}`);
+  console.log(`\nRequest key: ${response.requestKeys[0]}`);
   console.log("Transaction pending...");
 
   const txResult = await Pact.fetch.listen(
@@ -53,5 +53,5 @@ export async function transfer(
     API_HOST
   );
   console.log("Transaction mined!");
-  console.log(txResult);
+  return txResult;
 }

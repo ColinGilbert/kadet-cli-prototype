@@ -1,36 +1,81 @@
-import { getBalance } from "./get_balance";
-import { getTxStatus } from "./get_tx_status";
-import { transfer } from "./transfer";
+import { getBalance } from "./get_balance.js";
+import { getTxStatus } from "./get_tx_status.js";
+import { transfer } from "./transfer.js";
+import inquirer from "inquirer";
 import "dotenv/config";
-const globalArgs =
-  "Arguments: transfer receiver-name amount | read-balance | get-tx-status request-key";
-if (process.argv.length < 3) {
-  console.log(globalArgs);
-  process.exit();
+const mainPrompt = {
+  type: "list",
+  name: "main",
+  message: "Which operation would you like to perform?",
+  choices: ["transfer", "read-balance", "get-tx-status", "exit"],
+};
+
+const transferPrompts = [
+  {
+    type: "input",
+    name: "transferAcctName",
+    message: "Which account name would you like to transfer to?",
+  },
+  {
+    type: "input",
+    name: "transferAmount",
+    message: "What amount of KAD do you want to transfer?",
+  },
+];
+const txStatusPrompt = {
+  type: "input",
+  name: "requestKey",
+  message: "Which request key would you like to track?",
+};
+
+function main() {
+  console.log("Welcome to the Kadet CLI prototype.");
+  doMainPrompt();
 }
 
-if (process.argv[2] === "transfer") {
-  if (process.argv.length === 5) {
-    transfer(
-      process.env.SENDER_NAME as string,
-      process.argv[3],
-      process.argv[4]
-    );
-  } else {
-    console.log("Args: transfer receiver-name amount");
-  }
-} else if (process.argv[2] === "read-balance") {
-  if (process.argv.length === 3) {
-    console.log(getBalance(process.env.SENDER_NAME as string));
-  } else {
-    console.log("Args: read-balance");
-  }
-} else if (process.argv[2] === "get-tx-status") {
-  if (process.argv.length === 4) {
-    console.log(getTxStatus(process.argv[3]));
-  } else {
-    console.log("Args: get-tx-status request-id");
-  }
-} else {
-  console.log(globalArgs);
+function doTransferPrompt() {
+  inquirer.prompt(transferPrompts).then((answers: any) => {
+    const receiverName = answers.transferAcctName;
+    const amount = answers.transferAmount;
+    transfer(process.env.SENDER_NAME as string, receiverName, amount)
+      .then((results) => console.log(results))
+      .then(() => doMainPrompt());
+  });
 }
+
+function doReadBalance() {
+  getBalance(process.env.SENDER_NAME as string)
+    .then((results) => console.log(results))
+    .then(() => doMainPrompt());
+}
+
+function doGetTxStatus() {
+  inquirer.prompt(txStatusPrompt).then((answers: any) => {
+    getTxStatus(answers.requestKey)
+      .then((results) => console.log(results))
+      .then(() => doMainPrompt());
+  });
+}
+
+function doMainPrompt() {
+  inquirer.prompt(mainPrompt).then((answers: any) => {
+    switch (answers.main) {
+      case "transfer":
+        doTransferPrompt();
+        break;
+      case "read-balance":
+        doReadBalance();
+        break;
+      case "get-tx-status":
+        doGetTxStatus();
+        break;
+      case "exit":
+        process.exit(0);
+        break;
+      default:
+        prompt();
+    }
+  });
+}
+
+main();
