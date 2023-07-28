@@ -19,3 +19,5 @@ To run:
 ```
 npm run exec
 ```
+
+NOTE: The create-account code is broken. I'm blocked on it and will be emailing Kadena org asking for a better way of doing this.
