@@ -1,12 +1,15 @@
 import Pact from "pact-lang-api";
 
 import { NETWORK_ID, CHAIN_ID, API_HOST, creationTime } from "./constants.js";
-import "dotenv/config";
-const KEY_PAIR = {
-  publicKey: process.env.SENDER_PUBKEY,
-  secretKey: process.env.SENDER_SECRET_KEY,
-};
-export async function getBalance(account: string) {
+export async function getBalance(
+  account: string,
+  publicKey: string,
+  privateKey: string
+) {
+  const KEY_PAIR = {
+    publicKey: publicKey,
+    secretKey: privateKey,
+  };
   const cmd = {
     networkId: NETWORK_ID,
     keyPairs: KEY_PAIR,

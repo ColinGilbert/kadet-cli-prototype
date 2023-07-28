@@ -1,16 +1,17 @@
 // const Pact = require("pact-lang-api");
 import Pact from "pact-lang-api";
 import { NETWORK_ID, CHAIN_ID, API_HOST, creationTime } from "./constants.js";
-import "dotenv/config";
-const KEY_PAIR = {
-  publicKey: process.env.SENDER_PUBKEY,
-  secretKey: process.env.SENDER_SECRET_KEY,
-};
 export async function transfer(
   sender: string,
   receiver: string,
-  amount: string
+  amount: string,
+  publicKey: string,
+  secretKey: string
 ) {
+  const KEY_PAIR = {
+    publicKey: publicKey,
+    secretKey: secretKey,
+  };
   const cmd = {
     networkId: NETWORK_ID,
     keyPairs: [
