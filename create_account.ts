@@ -45,7 +45,7 @@ export async function createAccount() {
       gasLimit: 800,
        chainId: CHAIN_ID,
       gasPrice: 0.0000001,
-     sender: "colin-test",
+     sender: process.env.SENDER_NAME,
      //sender:  "free.kadet-gas-station-2.GAS_PAYER"
      },
    
