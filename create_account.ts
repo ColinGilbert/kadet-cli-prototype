@@ -16,7 +16,6 @@ export async function createAccount() {
   const newAccount = "k:" + process.env.CREATED_ACCT_PUBKEY;
   const cmd = {
     networkId: NETWORK_ID,
-    keyPairs: KEY_PAIR,
     pactCode: `(coin.create-account "${newAccount}" (read-keyset "account-keyset"))`,
     envData: {
       "account-keyset": {
@@ -24,14 +23,34 @@ export async function createAccount() {
         pred: "keys-all",
       },
     },
-    meta: {
-      creationTime: creationTime(),
-      ttl: 28000,
-      gasLimit: 800,
-      chainId: CHAIN_ID,
-      gasPrice: 0.0000001,
-      sender: KEY_PAIR.publicKey,
+    keyPairs:
+    {
+      publicKey: KEY_PAIR.publicKey,
+      secretKey: KEY_PAIR.secretKey,
+      clist:
+       [
+        {
+          name: "free.kadet-gas-station-2.GAS_PAYER",
+          args: [
+            newAccount,
+            {int: 1000},
+            0.00000001
+          ]
+        }
+      ]
     },
+     meta: {
+       creationTime: creationTime(),
+       ttl: 28000,
+      gasLimit: 800,
+       chainId: CHAIN_ID,
+      gasPrice: 0.0000001,
+     sender: "colin-test",
+     //sender:  "free.kadet-gas-station-2.GAS_PAYER"
+     },
+   
+
+    
   };
 
   const response = await Pact.fetch.send(cmd, API_HOST);
