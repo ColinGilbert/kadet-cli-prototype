@@ -12,7 +12,7 @@
   "keywords": [],
   "author": "",
   "type": "module",
-  "license": "All rights reserved",
+  "license": "MIT",
   "devDependencies": {
     "dotenv": "^16.3.1",
     "ts-node": "^10.9.1",
