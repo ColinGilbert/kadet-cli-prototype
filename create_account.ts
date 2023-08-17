@@ -3,7 +3,7 @@ import { NETWORK_ID, CHAIN_ID, API_HOST, creationTime } from "./constants.js";
 import { createKeysFromMnemonic } from "./keys.js";
 import "dotenv/config";
 
-export async function createAccount(mnemonic: string, accountCreatorName: string, publicKey: string, privateKey: string) {
+export async function createAccount(mnemonic: string, accountCreatorName: string, accountCreatorPublicKey: string, accountCreatorPrivateKey: string) {
   const keys = createKeysFromMnemonic(mnemonic);
   const newAccount = "k:" + keys.publicKey;
   const cmd = {
@@ -17,8 +17,8 @@ export async function createAccount(mnemonic: string, accountCreatorName: string
     },
     keyPairs:
     {
-      publicKey: publicKey,
-      secretKey: privateKey,
+      publicKey: accountCreatorPublicKey,
+      secretKey: accountCreatorPrivateKey,
       clist:
        [
         {
