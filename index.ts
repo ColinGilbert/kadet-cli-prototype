@@ -76,7 +76,7 @@ function doGetTxStatus() {
 function doCreateAccount() {
   const mnemonic = createRandomMnemonic()
   console.log("This is your recovery phrase. Be sure to write it down somewhere: " + mnemonic)
-  createAccount(mnemonic)
+  createAccount(mnemonic, senderName, publicKey, privateKey)
     .then((results) => console.log(results))
     .then(() => doMainPrompt());
 }

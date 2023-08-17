@@ -3,12 +3,7 @@ import { NETWORK_ID, CHAIN_ID, API_HOST, creationTime } from "./constants.js";
 import { createKeysFromMnemonic } from "./keys.js";
 import "dotenv/config";
 
-const KEY_PAIR = {
-  publicKey: process.env.SENDER_PUBKEY,
-  secretKey: process.env.SENDER_SECRET,
-};
-
-export async function createAccount(mnemonic: string) {
+export async function createAccount(mnemonic: string, accountCreatorName: string, publicKey: string, privateKey: string) {
   const keys = createKeysFromMnemonic(mnemonic);
   const newAccount = "k:" + keys.publicKey;
   const cmd = {
@@ -22,8 +17,8 @@ export async function createAccount(mnemonic: string) {
     },
     keyPairs:
     {
-      publicKey: KEY_PAIR.publicKey,
-      secretKey: KEY_PAIR.secretKey,
+      publicKey: publicKey,
+      secretKey: privateKey,
       clist:
        [
         {
@@ -42,7 +37,7 @@ export async function createAccount(mnemonic: string) {
        gasLimit: 800,
        chainId: CHAIN_ID,
        gasPrice: 0.0000001,
-       sender: process.env.SENDER_NAME,
+       sender: accountCreatorName,
      },
    
 
