@@ -2,6 +2,7 @@ import { getBalance } from "./get_balance.js";
 import { getTxStatus } from "./get_tx_status.js";
 import { transfer } from "./transfer.js";
 import { createAccount } from "./create_account.js";
+import { createRandomMnemonic } from "./keys.js";
 import inquirer from "inquirer";
 import "dotenv/config";
 
@@ -34,11 +35,14 @@ const transferPrompts = [
     message: "What amount of KAD do you want to transfer?",
   },
 ];
+
 const txStatusPrompt = {
   type: "input",
   name: "requestKey",
   message: "Which request key would you like to track?",
 };
+
+
 
 function main() {
   console.log("Welcome to the Kadet CLI prototype.");
@@ -70,7 +74,9 @@ function doGetTxStatus() {
 }
 
 function doCreateAccount() {
-  createAccount()
+  const mnemonic = createRandomMnemonic()
+  console.log("This is your recovery phrase. Be sure to write it down somewhere: " + mnemonic)
+  createAccount(mnemonic)
     .then((results) => console.log(results))
     .then(() => doMainPrompt());
 }
