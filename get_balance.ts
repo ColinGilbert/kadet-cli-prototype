@@ -2,10 +2,10 @@ import Pact from "pact-lang-api";
 
 import { NETWORK_ID, CHAIN_ID, API_HOST, creationTime } from "./constants.js";
 export async function getBalance(
-  account: string,
   publicKey: string,
   privateKey: string
 ) {
+  const account = "k:" + publicKey;
   const KEY_PAIR = {
     publicKey: publicKey,
     secretKey: privateKey,

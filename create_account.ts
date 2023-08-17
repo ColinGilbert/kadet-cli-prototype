@@ -1,10 +1,10 @@
 import Pact from "pact-lang-api";
 import { NETWORK_ID, CHAIN_ID, API_HOST, creationTime } from "./constants.js";
-import { createKeysFromMnemonic } from "./keys.js";
+import { getKeysFromMnemonic } from "./keys.js";
 import "dotenv/config";
 
 export async function createAccount(mnemonic: string, accountCreatorName: string, accountCreatorPublicKey: string, accountCreatorPrivateKey: string) {
-  const keys = createKeysFromMnemonic(mnemonic);
+  const keys = getKeysFromMnemonic(mnemonic);
   const newAccount = "k:" + keys.publicKey;
   const cmd = {
     networkId: NETWORK_ID,

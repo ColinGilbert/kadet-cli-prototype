@@ -2,7 +2,6 @@
 import Pact from "pact-lang-api";
 import { NETWORK_ID, CHAIN_ID, API_HOST, creationTime } from "./constants.js";
 export async function transfer(
-  sender: string,
   receiver: string,
   amount: string,
   publicKey: string,
@@ -12,6 +11,7 @@ export async function transfer(
     publicKey: publicKey,
     secretKey: secretKey,
   };
+  const sender = "k:" + publicKey;
   const cmd = {
     networkId: NETWORK_ID,
     keyPairs: [
@@ -46,13 +46,17 @@ export async function transfer(
 
   const response = await Pact.fetch.send(cmd, API_HOST);
   // console.log(response);
-  console.log(`\nRequest key: ${response.requestKeys[0]}`);
-  console.log("Transaction pending...");
+  if (response.requestKeys !== undefined) {
+    console.log(`\nRequest key: ${response.requestKeys[0]}`);
+    console.log("Transaction pending...");
 
-  const txResult = await Pact.fetch.listen(
-    { listen: response.requestKeys[0] },
-    API_HOST
-  );
-  console.log("Transaction mined!");
-  return txResult;
+    const txResult = await Pact.fetch.listen(
+     { listen: response.requestKeys[0] },
+     API_HOST
+    );
+    console.log("Transaction mined!");
+    
+    return txResult;
+  } else return "Error. Do you have any funds in your account?";
+  
 }
