@@ -1,6 +1,7 @@
 import { getBalance } from "./get_balance.js";
 import { getTxStatus } from "./get_tx_status.js";
 import { transfer } from "./transfer.js";
+import { crossChainTransfer } from "./crosschain_transfer.js"
 import { createAccount } from "./create_account.js";
 import { createRandomMnemonic, getKeysFromMnemonic } from "./keys.js";
 import inquirer from "inquirer";
@@ -21,6 +22,7 @@ const mainPrompt = {
     "unlock-account",
     "create-account",
     "transfer",
+    "cross-chain-transfer",
     "read-balance",
     "get-tx-status",
     "exit",
@@ -39,6 +41,25 @@ const transferPrompts = [
     message: "What amount of KAD do you want to transfer?",
   },
 ];
+
+const crossChainTransferPrompts = [
+  {
+    type: "input",
+    name: "transferAcctName",
+    message: "Which account name would you like to transfer to?",
+  },
+  {
+    type: "input",
+    name: "transferAmount",
+    message: "What amount of KAD do you want to transfer?",
+  },
+  {
+    type: "input",
+    name: "otherChain",
+    message: "Which other chain would you like to transfer to?",
+  },
+];
+
 
 const txStatusPrompt = {
   type: "input",
@@ -62,6 +83,18 @@ function doTransferPrompt() {
     const receiverName = answers.transferAcctName;
     const amount = answers.transferAmount;
     transfer(receiverName, amount, publicKey, privateKey)
+      .then((results) => console.log(results))
+      .then(() => doMainPrompt());
+  });
+}
+
+
+function doCrossChainTransferPrompt() {
+  inquirer.prompt(crossChainTransferPrompts).then((answers: any) => {
+    const receiverName = answers.transferAcctName;
+    const amount = answers.transferAmount;
+    const chainId = answers.otherChain;
+    crossChainTransfer(receiverName, amount, chainId, publicKey, privateKey)
       .then((results) => console.log(results))
       .then(() => doMainPrompt());
   });
@@ -109,6 +142,9 @@ function doMainPrompt() {
         break;
       case "transfer":
         doTransferPrompt();
+        break;
+      case "cross-chain-transfer":
+        doCrossChainTransferPrompt();
         break;
       case "read-balance":
         doReadBalance();
