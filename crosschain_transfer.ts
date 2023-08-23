@@ -1,24 +1,19 @@
 import { ChainwebChainId, ICommandResult } from "@kadena/chainweb-node-client";
 import {
   IContinuationPayloadObject,
-  ISignFunction,
   isSignedTransaction,
   Pact,
   readKeyset,
-  signWithChainweaver,
-  IQuickSignRequestBody,
 } from "@kadena/client";
-import { sign, hash } from "@kadena/cryptography-utils";
+import { sign } from "@kadena/cryptography-utils";
 import {
   ChainId,
   ICommand,
   ISignatureJson,
   IUnsignedCommand,
 } from "@kadena/types";
-import { parseTransactionCommand } from "./utils/parseTransactionCommand.js";
 import { listen, pollCreateSpv, pollStatus, submit } from "./utils/client.js";
 import { inspect } from "./utils/fp-helper.js";
-import { keyFromAccount } from "./utils/keyFromAccount.js";
 import { NETWORK_ID } from "./constants.js";
 import "dotenv/config";
 
