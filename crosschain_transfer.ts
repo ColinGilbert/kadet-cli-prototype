@@ -14,7 +14,7 @@ import { parseTransactionCommand } from './utils/parseTransactionCommand.js';
 import { listen, pollCreateSpv, pollStatus, submit } from './utils/client.js';
 import { inspect } from './utils/fp-helper.js';
 import { keyFromAccount } from './utils/keyFromAccount.js';
-
+import { NETWORK_ID } from './constants.js';
 import "dotenv/config"
 
 interface IAccount {
@@ -24,11 +24,11 @@ interface IAccount {
   guard: string;
 }
 
+// This code is written differently from the others, using the transaction building API from github.com/kadena-community/kadena.js
+// It is derived from  https://github.com/kadena-community/kadena.js/blob/main/packages/libs/client-examples/src/example-contract/crosschain-transfer.ts
+// This is as opposed to the rest of this application whose code was derived from the Pact-Lang-API Cookbook at https://docs.kadena.io/build/frontend/pact-lang-api-cookbook
 
-const receiverAccount: string =
-  'k:2f48080efe54e6eb670487f664bcaac7684b4ebfcfc8a3330ef080c9c97f7e11';
 
-const NETWORK_ID: string = 'testnet04';
 
 function startInTheFirstChain(
   from: IAccount,
