@@ -3,7 +3,12 @@ import { NETWORK_ID, CHAIN_ID, API_HOST, creationTime } from "./constants.js";
 import { getKeysFromMnemonic } from "./keys.js";
 import "dotenv/config";
 
-export async function createAccount(mnemonic: string, accountCreatorName: string, accountCreatorPublicKey: string, accountCreatorPrivateKey: string) {
+export async function createAccount(
+  mnemonic: string,
+  accountCreatorName: string,
+  accountCreatorPublicKey: string,
+  accountCreatorPrivateKey: string
+) {
   const keys = getKeysFromMnemonic(mnemonic);
   const newAccount = "k:" + keys.publicKey;
   const cmd = {
@@ -15,33 +20,24 @@ export async function createAccount(mnemonic: string, accountCreatorName: string
         pred: "keys-all",
       },
     },
-    keyPairs:
-    {
+    keyPairs: {
       publicKey: accountCreatorPublicKey,
       secretKey: accountCreatorPrivateKey,
-      clist:
-       [
+      clist: [
         {
           name: "free.kadet-gas-station-2.GAS_PAYER",
-          args: [
-            newAccount,
-            {int: 1000},
-            0.00000001
-          ]
-        }
-      ]
+          args: [newAccount, { int: 1000 }, 0.00000001],
+        },
+      ],
     },
-     meta: {
-       creationTime: creationTime(),
-       ttl: 28000,
-       gasLimit: 800,
-       chainId: CHAIN_ID,
-       gasPrice: 0.0000001,
-       sender: accountCreatorName,
-     },
-   
-
-    
+    meta: {
+      creationTime: creationTime(),
+      ttl: 28000,
+      gasLimit: 800,
+      chainId: CHAIN_ID,
+      gasPrice: 0.0000001,
+      sender: accountCreatorName,
+    },
   };
 
   const response = await Pact.fetch.send(cmd, API_HOST);

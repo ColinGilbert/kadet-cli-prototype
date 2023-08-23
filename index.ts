@@ -1,7 +1,7 @@
 import { getBalance } from "./get_balance.js";
 import { getTxStatus } from "./get_tx_status.js";
 import { transfer } from "./transfer.js";
-import { crossChainTransfer } from "./crosschain_transfer.js"
+import { crossChainTransfer } from "./crosschain_transfer.js";
 import { createAccount } from "./create_account.js";
 import { createRandomMnemonic, getKeysFromMnemonic } from "./keys.js";
 import inquirer from "inquirer";
@@ -52,7 +52,8 @@ const crossChainTransferPrompts = [
   {
     type: "input",
     name: "receiverPubkey",
-    message: "What is the public key of the account you're sending to? Leave blank if account is named \"k:<PUBLIC_KEY>\"",
+    message:
+      'What is the public key of the account you\'re sending to? Leave blank if account is named "k:<PUBLIC_KEY>"',
   },
   {
     type: "input",
@@ -66,7 +67,6 @@ const crossChainTransferPrompts = [
   },
 ];
 
-
 const txStatusPrompt = {
   type: "input",
   name: "requestKey",
@@ -76,8 +76,8 @@ const txStatusPrompt = {
 const unlockPrompt = {
   type: "input",
   name: "mnemonic",
-  message: "Please enter your recovery phrase."
-}
+  message: "Please enter your recovery phrase.",
+};
 
 function main() {
   console.log("Welcome to the Kadet CLI prototype.");
@@ -94,17 +94,30 @@ function doTransferPrompt() {
   });
 }
 
-
 function doCrossChainTransferPrompt() {
   inquirer.prompt(crossChainTransferPrompts).then((answers: any) => {
     const receiverName = answers.receiverName;
-    const receiverPubkey = answers.receiverPubkey === "" ? keyFromAccount(receiverName) : answers.receiverPubkey;
+    const receiverPubkey =
+      answers.receiverPubkey === ""
+        ? keyFromAccount(receiverName)
+        : answers.receiverPubkey;
     const amount = answers.transferAmount;
     const chainId = answers.otherChain;
-    crossChainTransfer(receiverName, receiverPubkey, amount, chainId, "k:" + publicKey, publicKey, privateKey)
+    crossChainTransfer(
+      receiverName,
+      receiverPubkey,
+      amount,
+      chainId,
+      "k:" + publicKey,
+      publicKey,
+      privateKey
+    )
       .then((results: any) => console.log(results))
       .then(() => doMainPrompt())
-      .catch(error => {console.log(error); doMainPrompt()} );
+      .catch((error) => {
+        console.log(error);
+        doMainPrompt();
+      });
   });
 }
 
@@ -123,17 +136,27 @@ function doGetTxStatus() {
 }
 
 function doCreateAccount() {
-  const mnemonic = createRandomMnemonic()
-  console.log("This is your recovery phrase. Be sure to write it down somewhere: " + mnemonic)
-  createAccount(mnemonic, acctCreatorName, acctCreatorPublicKey, acctCreatorPrivateKey)
+  const mnemonic = createRandomMnemonic();
+  console.log(
+    "This is your recovery phrase. Be sure to write it down somewhere: " +
+      mnemonic
+  );
+  createAccount(
+    mnemonic,
+    acctCreatorName,
+    acctCreatorPublicKey,
+    acctCreatorPrivateKey
+  )
     .then((results) => console.log(results))
     .then(() => doMainPrompt());
 }
 
 function doUnlock() {
   inquirer.prompt(unlockPrompt).then((answers: any) => {
-    unlockAccount(answers.mnemonic).then(() => console.log("Account public key: " + publicKey)).then(() => doMainPrompt())
-  })
+    unlockAccount(answers.mnemonic)
+      .then(() => console.log("Account public key: " + publicKey))
+      .then(() => doMainPrompt());
+  });
 }
 
 async function unlockAccount(mnemonic: string) {

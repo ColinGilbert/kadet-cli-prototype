@@ -1,4 +1,4 @@
-import { ICommand, IUnsignedCommand } from '@kadena/types';
+import { ICommand, IUnsignedCommand } from "@kadena/types";
 
 /**
  * parse a ICommand or IUnsignedCommand JSON object to IPactCommand
@@ -6,7 +6,7 @@ import { ICommand, IUnsignedCommand } from '@kadena/types';
  * @internal
  */
 
-import { ChainId, ICap } from '@kadena/types';
+import { ChainId, ICap } from "@kadena/types";
 
 /**
  * The payload of a Execution transaction
@@ -59,14 +59,14 @@ export interface IPactCommand {
   signers: Array<{
     pubKey: string;
     address?: string;
-    scheme?: 'ED25519' | 'ETH';
+    scheme?: "ED25519" | "ETH";
     clist?: ICap[];
   }>;
   networkId: string;
   nonce: string;
 }
 export const parseTransactionCommand: (
-  transaction: IUnsignedCommand | ICommand,
+  transaction: IUnsignedCommand | ICommand
 ) => IPactCommand = (transaction) => {
   return JSON.parse(transaction.cmd);
 };

@@ -1,4 +1,4 @@
-import { ChainwebChainId, ICommandResult } from '@kadena/chainweb-node-client';
+import { ChainwebChainId, ICommandResult } from "@kadena/chainweb-node-client";
 import {
   IContinuationPayloadObject,
   ISignFunction,
@@ -7,15 +7,20 @@ import {
   readKeyset,
   signWithChainweaver,
   IQuickSignRequestBody,
-} from '@kadena/client';
-import { sign, hash } from "@kadena/cryptography-utils"
-import { ChainId, ICommand, ISignatureJson, IUnsignedCommand } from '@kadena/types';
-import { parseTransactionCommand } from './utils/parseTransactionCommand.js';
-import { listen, pollCreateSpv, pollStatus, submit } from './utils/client.js';
-import { inspect } from './utils/fp-helper.js';
-import { keyFromAccount } from './utils/keyFromAccount.js';
-import { NETWORK_ID } from './constants.js';
-import "dotenv/config"
+} from "@kadena/client";
+import { sign, hash } from "@kadena/cryptography-utils";
+import {
+  ChainId,
+  ICommand,
+  ISignatureJson,
+  IUnsignedCommand,
+} from "@kadena/types";
+import { parseTransactionCommand } from "./utils/parseTransactionCommand.js";
+import { listen, pollCreateSpv, pollStatus, submit } from "./utils/client.js";
+import { inspect } from "./utils/fp-helper.js";
+import { keyFromAccount } from "./utils/keyFromAccount.js";
+import { NETWORK_ID } from "./constants.js";
+import "dotenv/config";
 
 interface IAccount {
   account: string;
@@ -28,48 +33,46 @@ interface IAccount {
 // It is derived from  https://github.com/kadena-community/kadena.js/blob/main/packages/libs/client-examples/src/example-contract/crosschain-transfer.ts
 // This is as opposed to the rest of this application whose code was derived from the Pact-Lang-API Cookbook at https://docs.kadena.io/build/frontend/pact-lang-api-cookbook
 
-
-
 function startInTheFirstChain(
   from: IAccount,
   to: IAccount,
-  amount: string,
+  amount: string
 ): IUnsignedCommand {
   return Pact.builder
     .execution(
-      Pact.modules.coin.defpact['transfer-crosschain'](
+      Pact.modules.coin.defpact["transfer-crosschain"](
         from.account,
         to.account,
-        readKeyset('receiver-guard'),
+        readKeyset("receiver-guard"),
         to.chainId,
         {
           decimal: amount.toString(),
-        },
-      ),
+        }
+      )
     )
     .addSigner(from.publicKey, (withCapability: any) => [
       // in typescript this function suggests you only relevant capabilities
-      withCapability('coin.GAS'),
+      withCapability("coin.GAS"),
       withCapability(
-        'coin.TRANSFER_XCHAIN',
+        "coin.TRANSFER_XCHAIN",
         from.account,
         to.account,
         {
           decimal: amount,
         },
-        to.chainId,
+        to.chainId
       ),
     ])
-    .addKeyset('receiver-guard', 'keys-all', to.publicKey)
+    .addKeyset("receiver-guard", "keys-all", to.publicKey)
     .setMeta({ chainId: from.chainId, senderAccount: from.account })
     .setNetworkId(NETWORK_ID)
     .createTransaction();
 }
 
 function finishInTheTargetChain(
-  continuation: IContinuationPayloadObject['cont'],
+  continuation: IContinuationPayloadObject["cont"],
   targetChainId: ChainId,
-  gasPayer: string = 'kadena-xchain-gas',
+  gasPayer: string = "kadena-xchain-gas"
 ): IUnsignedCommand {
   const builder = Pact.builder
     .continuation(continuation)
@@ -88,35 +91,51 @@ function finishInTheTargetChain(
   return builder.createTransaction();
 }
 
-async function signCommand(transaction: IUnsignedCommand, senderPubkey: string, senderSecret: string) {
-    const cmd : ICommand = {cmd: transaction.cmd, hash: transaction.hash, sigs: [sign(transaction.cmd, {secretKey: senderSecret, publicKey: senderPubkey}) as ISignatureJson]};
-    return cmd;
+async function signCommand(
+  transaction: IUnsignedCommand,
+  senderPubkey: string,
+  senderSecret: string
+) {
+  const cmd: ICommand = {
+    cmd: transaction.cmd,
+    hash: transaction.hash,
+    sigs: [
+      sign(transaction.cmd, {
+        secretKey: senderSecret,
+        publicKey: senderPubkey,
+      }) as ISignatureJson,
+    ],
+  };
+  return cmd;
 }
 
 async function doCrossChainTransfer(
   from: IAccount,
   to: IAccount,
   amount: string,
-  senderSecret: string,
+  senderSecret: string
 ): Promise<Record<string, ICommandResult>> {
   //const state = {};
   return (
     Promise.resolve(startInTheFirstChain(from, to, amount))
-      .then((command) => { return signCommand(command, from.publicKey, senderSecret) })
+      .then((command) => {
+        return signCommand(command, from.publicKey, senderSecret);
+      })
       .then((command) =>
         isSignedTransaction(command)
           ? command
-          : Promise.reject('CMD_NOT_SIGNED'),)
+          : Promise.reject("CMD_NOT_SIGNED")
+      )
       // inspect is only for development you can remove them
-      .then(inspect('EXEC_SIGNED'))
+      .then(inspect("EXEC_SIGNED"))
       .then((cmd) => submit(cmd))
-      .then(inspect('SUBMIT_RESULT'))
+      .then(inspect("SUBMIT_RESULT"))
       .then(listen)
-      .then(inspect('LISTEN_RESULT'))
+      .then(inspect("LISTEN_RESULT"))
       .then((status) =>
-        status.result.status === 'failure'
-          ? Promise.reject(new Error('DEBIT REJECTED'))
-          : status,
+        status.result.status === "failure"
+          ? Promise.reject(new Error("DEBIT REJECTED"))
+          : status
       )
       .then((status) =>
         Promise.all([
@@ -127,11 +146,11 @@ async function doCrossChainTransfer(
               networkId: NETWORK_ID,
               chainId: from.chainId,
             },
-            to.chainId,
+            to.chainId
           ),
-        ]),
+        ])
       )
-      .then(inspect('POLL_SPV_RESULT'))
+      .then(inspect("POLL_SPV_RESULT"))
       .then(
         ([status, proof]) =>
           finishInTheTargetChain(
@@ -141,10 +160,10 @@ async function doCrossChainTransfer(
               rollback: false,
               step: 1,
             },
-            to.chainId,
-          ) as ICommand,
+            to.chainId
+          ) as ICommand
       )
-      .then(inspect('CONT_TR'))
+      .then(inspect("CONT_TR"))
       // // uncomment the following lines if you want to pay gas from your account not the gas-station
       // .then((command) => signWithChainweaver(command))
       // .then((command) =>
@@ -152,30 +171,36 @@ async function doCrossChainTransfer(
       // )
       // .then(inspect('CONT_SIGNED'))
       .then((cmd) => submit(cmd))
-      .then(inspect('SUBMIT_RESULT'))
+      .then(inspect("SUBMIT_RESULT"))
       .then(pollStatus)
-      .then(inspect('FINAL_RESULT'))
+      .then(inspect("FINAL_RESULT"))
   );
 }
 
-export function crossChainTransfer(receiverName: string, receiverPubkey: string, amount: string, chain: string, senderName: string, senderPubkey: string, senderSecret: string) {
+export function crossChainTransfer(
+  receiverName: string,
+  receiverPubkey: string,
+  amount: string,
+  chain: string,
+  senderName: string,
+  senderPubkey: string,
+  senderSecret: string
+) {
+  const from: IAccount = {
+    account: senderName,
+    chainId: "1",
+    publicKey: senderPubkey,
+    // use keyset guard
+    guard: senderPubkey,
+  };
 
-const from: IAccount = {
-  account: senderName,
-  chainId: '1',
-  publicKey: senderPubkey,
-  // use keyset guard
-  guard: senderPubkey,
-};
+  const to: IAccount = {
+    account: receiverName, // k:account of sender
+    chainId: chain as ChainwebChainId,
+    publicKey: receiverPubkey,
+    // use keyset guard
+    guard: receiverPubkey,
+  };
 
-const to: IAccount = {
-  account: receiverName, // k:account of sender
-  chainId: chain as ChainwebChainId,
-  publicKey: receiverPubkey,
-  // use keyset guard
-  guard: receiverPubkey,
-};
-
-  return doCrossChainTransfer(from, to, amount, senderSecret)
-
+  return doCrossChainTransfer(from, to, amount, senderSecret);
 }

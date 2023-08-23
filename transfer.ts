@@ -51,12 +51,11 @@ export async function transfer(
     console.log("Transaction pending...");
 
     const txResult = await Pact.fetch.listen(
-     { listen: response.requestKeys[0] },
-     API_HOST
+      { listen: response.requestKeys[0] },
+      API_HOST
     );
     console.log("Transaction mined!");
-    
+
     return txResult;
   } else return "Error. Do you have any funds in your account?";
-  
 }
