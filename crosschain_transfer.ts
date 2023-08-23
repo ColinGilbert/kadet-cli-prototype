@@ -1,4 +1,4 @@
-import { ICommandResult } from '@kadena/chainweb-node-client';
+import { ChainwebChainId, ICommandResult } from '@kadena/chainweb-node-client';
 import {
   IContinuationPayloadObject,
   ISignFunction,
@@ -9,11 +9,12 @@ import {
   IQuickSignRequestBody,
 } from '@kadena/client';
 import { sign, hash } from "@kadena/cryptography-utils"
-import { ChainId, ICommand, IUnsignedCommand } from '@kadena/types';
+import { ChainId, ICommand, ISignatureJson, IUnsignedCommand } from '@kadena/types';
 import { parseTransactionCommand } from './utils/parseTransactionCommand.js';
 import { listen, pollCreateSpv, pollStatus, submit } from './utils/client.js';
 import { inspect } from './utils/fp-helper.js';
 import { keyFromAccount } from './utils/keyFromAccount.js';
+
 import "dotenv/config"
 
 interface IAccount {
@@ -23,14 +24,6 @@ interface IAccount {
   guard: string;
 }
 
-
-// npx ts-node crosschain-transfer.ts
-
-const amount: string = '1';
-// change these two accounts with your accounts
-const senderAccount: string = process.env.ACCT_CREATOR_NAME as string;
-const senderPubkey: string = process.env.ACCT_CREATOR_PUBKEY as string;
-const senderSecret: string = process.env.ACCT_CREATOR_SECRET as string;
 
 const receiverAccount: string =
   'k:2f48080efe54e6eb670487f664bcaac7684b4ebfcfc8a3330ef080c9c97f7e11';
@@ -95,12 +88,8 @@ function finishInTheTargetChain(
   return builder.createTransaction();
 }
 
-async function signCommand(transaction: IUnsignedCommand) {
-
-
-    console.log(transaction)
-
-    let cmd : ICommand = {cmd: transaction.cmd, hash: transaction.hash, sigs: [sign(transaction.cmd, {secretKey: senderSecret, publicKey: senderPubkey}) as string]};
+async function signCommand(transaction: IUnsignedCommand, senderPubkey: string, senderSecret: string) {
+    const cmd : ICommand = {cmd: transaction.cmd, hash: transaction.hash, sigs: [sign(transaction.cmd, {secretKey: senderSecret, publicKey: senderPubkey}) as ISignatureJson]};
     return cmd;
 }
 
@@ -108,11 +97,12 @@ async function doCrossChainTransfer(
   from: IAccount,
   to: IAccount,
   amount: string,
+  senderSecret: string,
 ): Promise<Record<string, ICommandResult>> {
-  const state = {};
+  //const state = {};
   return (
     Promise.resolve(startInTheFirstChain(from, to, amount))
-      .then((command) => { return signCommand(command) })
+      .then((command) => { return signCommand(command, from.publicKey, senderSecret) })
       .then((command) =>
         isSignedTransaction(command)
           ? command
@@ -168,8 +158,10 @@ async function doCrossChainTransfer(
   );
 }
 
+export function crossChainTransfer(receiverName: string, receiverPubkey: string, amount: string, chain: string, senderName: string, senderPubkey: string, senderSecret: string) {
+
 const from: IAccount = {
-  account: senderAccount,
+  account: senderName,
   chainId: '1',
   publicKey: senderPubkey,
   // use keyset guard
@@ -177,13 +169,13 @@ const from: IAccount = {
 };
 
 const to: IAccount = {
-  account: receiverAccount, // k:account of sender
-  chainId: '0',
-  publicKey: keyFromAccount(receiverAccount),
+  account: receiverName, // k:account of sender
+  chainId: chain as ChainwebChainId,
+  publicKey: receiverPubkey,
   // use keyset guard
-  guard: keyFromAccount(receiverAccount),
+  guard: receiverPubkey,
 };
 
-doCrossChainTransfer(from, to, amount)
-  .then((result) => console.log('success', result))
-  .catch((error) => console.error('error', error));
+  return doCrossChainTransfer(from, to, amount, senderSecret)
+
+}

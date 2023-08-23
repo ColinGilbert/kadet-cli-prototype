@@ -6,6 +6,7 @@ import { createAccount } from "./create_account.js";
 import { createRandomMnemonic, getKeysFromMnemonic } from "./keys.js";
 import inquirer from "inquirer";
 import "dotenv/config";
+import { keyFromAccount } from "./utils/keyFromAccount.js";
 
 const acctCreatorName = process.env.ACCT_CREATOR_NAME as string;
 const acctCreatorPrivateKey = process.env.ACCT_CREATOR_SECRET as string;
@@ -45,8 +46,13 @@ const transferPrompts = [
 const crossChainTransferPrompts = [
   {
     type: "input",
-    name: "transferAcctName",
+    name: "receiverName",
     message: "Which account name would you like to transfer to?",
+  },
+  {
+    type: "input",
+    name: "receiverPubkey",
+    message: "What is the public key of the account you're sending to? Leave blank if account is named \"k:<PUBLIC_KEY>\"",
   },
   {
     type: "input",
@@ -56,7 +62,7 @@ const crossChainTransferPrompts = [
   {
     type: "input",
     name: "otherChain",
-    message: "Which other chain would you like to transfer to?",
+    message: "Which other chain would you like to transfer to (0-19)?",
   },
 ];
 
@@ -91,12 +97,14 @@ function doTransferPrompt() {
 
 function doCrossChainTransferPrompt() {
   inquirer.prompt(crossChainTransferPrompts).then((answers: any) => {
-    const receiverName = answers.transferAcctName;
+    const receiverName = answers.receiverName;
+    const receiverPubkey = answers.receiverPubkey === "" ? keyFromAccount(receiverName) : answers.receiverPubkey;
     const amount = answers.transferAmount;
     const chainId = answers.otherChain;
-    crossChainTransfer(receiverName, amount, chainId, publicKey, privateKey)
-      .then((results) => console.log(results))
-      .then(() => doMainPrompt());
+    crossChainTransfer(receiverName, receiverPubkey, amount, chainId, "k:" + publicKey, publicKey, privateKey)
+      .then((results: any) => console.log(results))
+      .then(() => doMainPrompt())
+      .catch(error => {console.log(error); doMainPrompt()} );
   });
 }
 
