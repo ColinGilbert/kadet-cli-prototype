@@ -5,12 +5,7 @@ import { crossChainTransfer } from "./crosschain_transfer.js";
 import { createAccount } from "./create_account.js";
 import { createRandomMnemonic, getKeysFromMnemonic } from "./keys.js";
 import inquirer from "inquirer";
-import "dotenv/config";
 import { keyFromAccount } from "./utils/keyFromAccount.js";
-
-const acctCreatorName = process.env.ACCT_CREATOR_NAME as string;
-const acctCreatorPrivateKey = process.env.ACCT_CREATOR_SECRET as string;
-const acctCreatorPublicKey = process.env.ACCT_CREATOR_PUBKEY as string;
 
 let privateKey = "";
 let publicKey = "";
@@ -141,12 +136,7 @@ function doCreateAccount() {
     "This is your recovery phrase. Be sure to write it down somewhere: " +
       mnemonic
   );
-  createAccount(
-    mnemonic,
-    acctCreatorName,
-    acctCreatorPublicKey,
-    acctCreatorPrivateKey
-  )
+  createAccount(mnemonic)
     .then((results) => console.log(results))
     .then(() => doMainPrompt());
 }

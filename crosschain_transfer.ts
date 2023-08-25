@@ -24,9 +24,9 @@ interface IAccount {
   guard: string;
 }
 
-// This code is written differently from the others, using the transaction building API from github.com/kadena-community/kadena.js
+// This code is written differently from the others, using the transaction builder API from github.com/kadena-community/kadena.js
 // It is derived from  https://github.com/kadena-community/kadena.js/blob/main/packages/libs/client-examples/src/example-contract/crosschain-transfer.ts
-// This is as opposed to the rest of this application whose code was derived from the Pact-Lang-API Cookbook at https://docs.kadena.io/build/frontend/pact-lang-api-cookbook
+// This is as opposed to the rest of this application whose code was derived from the Pact-Lang-API Cookbook found at https://docs.kadena.io/build/frontend/pact-lang-api-cookbook
 
 function startInTheFirstChain(
   from: IAccount,

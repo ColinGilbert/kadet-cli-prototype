@@ -3,12 +3,7 @@ import { NETWORK_ID, CHAIN_ID, API_HOST, creationTime } from "./constants.js";
 import { getKeysFromMnemonic } from "./keys.js";
 import "dotenv/config";
 
-export async function createAccount(
-  mnemonic: string,
-  accountCreatorName: string,
-  accountCreatorPublicKey: string,
-  accountCreatorPrivateKey: string
-) {
+export async function createAccount(mnemonic: string) {
   const keys = getKeysFromMnemonic(mnemonic);
   const newAccount = "k:" + keys.publicKey;
   const cmd = {
@@ -21,22 +16,16 @@ export async function createAccount(
       },
     },
     keyPairs: {
-      publicKey: accountCreatorPublicKey,
-      secretKey: accountCreatorPrivateKey,
-      clist: [
-        {
-          name: "free.kadet-gas-station-2.GAS_PAYER",
-          args: [newAccount, { int: 1000 }, 0.00000001],
-        },
-      ],
+      publicKey: keys.publicKey,
+      secretKey: keys.secretKey,
     },
     meta: {
       creationTime: creationTime(),
       ttl: 28000,
-      gasLimit: 800,
+      gasLimit: 850,
       chainId: CHAIN_ID,
-      gasPrice: 0.0000001,
-      sender: accountCreatorName,
+      gasPrice: 0.00000001,
+      sender: "kadena-xchain-gas",
     },
   };
 
