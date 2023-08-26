@@ -24,7 +24,6 @@
     "@kadena/cryptography-utils": "^0.3.7",
     "@kadena/types": "^0.4.2",
     "bip39": "^3.1.0",
-    "cardano-crypto.js": "github:kadena-io/cardano-crypto.js#jam@chainweaver-keygen",
     "D": "^1.0.0",
     "inquirer": "^9.2.8",
     "pact-lang-api": "^4.3.6"
